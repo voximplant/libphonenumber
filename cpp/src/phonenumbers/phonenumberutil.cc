@@ -14,9 +14,9 @@
 
 #include "phonenumbers/phonenumberutil.h"
 
-#include <string.h>
 #include <algorithm>
 #include <cctype>
+#include <cstring>
 #include <iterator>
 #include <map>
 #include <utility>
@@ -227,7 +227,7 @@ string CreateExtnPattern(const string& single_extn_symbols) {
           "[:\\.．]?[  \\t,-]*", capturing_extn_digits, "#?|" */
       "[ \xC2\xA0\\t,]*(?:e?xt(?:ensi(?:o\xCC\x81?|\xC3\xB3))?n?|"
       "(?:\xEF\xBD\x85)?\xEF\xBD\x98\xEF\xBD\x94(?:\xEF\xBD\x8E)?|"
-      "доб|[", single_extn_symbols, "]|int|"
+      "\xD0\xB4\xD0\xBE\xD0\xB1|[", single_extn_symbols, "]|int|"
       "\xEF\xBD\x89\xEF\xBD\x8E\xEF\xBD\x94|anexo)"
       "[:\\.\xEF\xBC\x8E]?[ \xC2\xA0\\t,-]*", capturing_extn_digits,
       "#?|[- ]+([", kDigits, "]{1,5})#"));
@@ -536,7 +536,6 @@ class PhoneNumberRegExpsAndMappings {
       all_plus_number_grouping_symbols_.insert(std::make_pair(c, c));
     }
 
-    mobile_token_mappings_.insert(std::make_pair(52, '1'));
     mobile_token_mappings_.insert(std::make_pair(54, '9'));
     geo_mobile_countries_without_mobile_area_codes_.insert(86);  // China
     geo_mobile_countries_.insert(52);  // Mexico
@@ -1200,18 +1199,6 @@ void PhoneNumberUtil::FormatNumberForMobileDialing(
         // string here.
         formatted_number->assign("");
       }
-    } else if (is_valid_number && region_code == "HU") {
-      // The national format for HU numbers doesn't contain the national prefix,
-      // because that is how numbers are normally written down. However, the
-      // national prefix is obligatory when dialing from a mobile phone, except
-      // for short numbers. As a result, we add it back here if it is a valid
-      // regular length phone number.
-      Format(number_no_extension, NATIONAL, formatted_number);
-      string hu_national_prefix;
-      GetNddPrefixForRegion(region_code, true /* strip non-digits */,
-                            &hu_national_prefix);
-      formatted_number->assign(
-          StrCat(hu_national_prefix, " ", *formatted_number));
     } else if (country_calling_code == kNanpaCountryCode) {
       // For NANPA countries, we output international format for numbers that
       // can be dialed internationally, since that always works, except for
@@ -1426,8 +1413,14 @@ void PhoneNumberUtil::FormatInOriginalFormat(const PhoneNumber& number,
       // We assume that the first-group symbol will never be _before_ the
       // national prefix.
       if (!candidate_national_prefix_rule.empty()) {
-        candidate_national_prefix_rule.erase(
-            candidate_national_prefix_rule.find("$1"));
+        size_t index_of_first_group = candidate_national_prefix_rule.find("$1");
+        if (index_of_first_group == string::npos) {
+          LOG(ERROR) << "First group missing in national prefix rule: "
+              << candidate_national_prefix_rule;
+          Format(number, NATIONAL, formatted_number);
+          break;
+        }
+        candidate_national_prefix_rule.erase(index_of_first_group);
         NormalizeDigitsOnly(&candidate_national_prefix_rule);
       }
       if (candidate_national_prefix_rule.empty()) {
