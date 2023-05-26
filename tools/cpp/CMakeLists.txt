@@ -14,16 +14,14 @@
 
 # Author: Patrick Mezard
 
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 3.11)
+
+# Pick the C++ standard to compile with.
+# Abseil currently supports C++11, C++14, and C++17.
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project (generate_geocoding_data)
-
-# Helper functions dealing with finding libraries and programs this library
-# depends on.
-
-include (gtest.cmake)
-
-find_or_build_gtest ()
 
 set (
   SOURCES
@@ -38,20 +36,24 @@ endif ()
 include_directories ("src")
 
 add_executable (generate_geocoding_data ${SOURCES})
+target_link_libraries (generate_geocoding_data absl::strings absl::btree absl::node_hash_set)
 
-set (TEST_SOURCES
-  "src/cpp-build/generate_geocoding_data.cc"
-  "test/cpp-build/generate_geocoding_data_test.cc"
-  "test/cpp-build/run_tests.cc"
-)
+if (BUILD_TESTING)
+  set (TEST_SOURCES
+      "src/cpp-build/generate_geocoding_data.cc"
+      "test/cpp-build/generate_geocoding_data_test.cc"
+      "test/cpp-build/run_tests.cc"
+  )
 
-set (TEST_LIBS ${GTEST_LIB})
+  set (TEST_LIBS ${GTEST_LIB})
 
-if (NOT WIN32)
-  list (APPEND TEST_LIBS pthread)
-endif ()
+  if (NOT WIN32)
+    list (APPEND TEST_LIBS pthread)
+  endif ()
 
-# Build the testing binary.
-include_directories ("test")
-add_executable (generate_geocoding_data_test ${TEST_SOURCES})
-target_link_libraries (generate_geocoding_data_test ${TEST_LIBS})
+  # Build the testing binary.
+  include_directories ("test")
+  add_executable (generate_geocoding_data_test ${TEST_SOURCES})
+  target_link_libraries (generate_geocoding_data_test absl::btree ${TEST_LIBS} absl::node_hash_set)
+endif()
+
