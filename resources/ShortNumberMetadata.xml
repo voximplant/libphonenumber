@@ -11491,6 +11491,7 @@
         <exampleNumber>01</exampleNumber>
         <nationalNumberPattern>
           112|
+          122|
           (?:
             0|
             10
@@ -11502,10 +11503,11 @@
         <exampleNumber>01</exampleNumber>
         <nationalNumberPattern>
           112|
+          122|
           (?:
             0|
             10
-          )[1-3]
+          )[1-4]
         </nationalNumberPattern>
       </tollFree>
       <emergency>
@@ -11513,6 +11515,7 @@
         <exampleNumber>01</exampleNumber>
         <nationalNumberPattern>
           112|
+          122|
           (?:
             0|
             10
