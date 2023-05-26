@@ -320,6 +320,16 @@ public class ShortNumberInfoTest extends TestMetadataTestCase {
     assertFalse(shortInfo.isEmergencyNumber("0711234567", RegionCode.ZW));
   }
 
+  public void testIsEmergencyNumber_RU() {
+    // Zimbabwe doesn't have any metadata in the test metadata.
+    assertTrue(shortInfo.isEmergencyNumber("112", RegionCode.RU));
+    assertTrue(shortInfo.isEmergencyNumber("101", RegionCode.RU));
+    assertTrue(shortInfo.isEmergencyNumber("102", RegionCode.RU));
+    assertTrue(shortInfo.isEmergencyNumber("103", RegionCode.RU));
+    assertTrue(shortInfo.isEmergencyNumber("104", RegionCode.RU));
+    assertFalse(shortInfo.isEmergencyNumber("0711234567", RegionCode.RU));
+  }
+
   public void testEmergencyNumberForSharedCountryCallingCode() {
     // Test the emergency number 112, which is valid in both Australia and the Christmas Islands.
     assertTrue(shortInfo.isEmergencyNumber("112", RegionCode.AU));
