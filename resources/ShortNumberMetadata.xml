@@ -692,7 +692,7 @@
           )\d
         </nationalNumberPattern>
       </tollFree>
-      <!-- Added yesss! numbers 810810 , 810820 and 810830 based on their website. 
+      <!-- Added yesss! numbers 810810 , 810820 and 810830 based on their website.
            Added Georg number 610 based on their website. -->
       <carrierSpecific>
         <possibleLengths national="3,6"/>
